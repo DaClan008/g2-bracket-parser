@@ -4,7 +4,7 @@
   "description": "Parse a JavaScript string to find conent in and arround brackets.",
   "main": "index.js",
   "scripts": {
-    "test": "jasmine start ./test/**/*[sS]pec.js"
+    "test": "jasmine JASMINE_CONFIG_PATH=./test/jasmine.json"
   },
   "repository": {
     "type": "git",

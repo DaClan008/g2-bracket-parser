@@ -3,6 +3,6 @@ node_js:
   - "node"
   - "latest 6.x release"
   - "iojs"
-script: test
+script: npm test
 before_script:
   - npm install
