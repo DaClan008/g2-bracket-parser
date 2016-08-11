@@ -1,0 +1,25 @@
+{
+  "name": "g2-bracket-parser",
+  "version": "1.0.0",
+  "description": "Parse a JavaScript string to find conent in and arround brackets.",
+  "main": "index.js",
+  "scripts": {
+    "test": "./test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DaClan008/g2-bracket-parser.git"
+  },
+  "keywords": [
+    "parse",
+    "bracket",
+    "enclose",
+    "enclosing"
+  ],
+  "author": "Jan Lehmkuhl <DaClan008@users.noreply.github.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/DaClan008/g2-bracket-parser/issues"
+  },
+  "homepage": "https://github.com/DaClan008/g2-bracket-parser#readme"
+}
