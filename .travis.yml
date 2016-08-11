@@ -8,4 +8,4 @@ before_script:
   - npm -d install
 
 after_script:
-  - cat ./coverage/lcov.info | .node_modules/coveralls/bin/coveralls.js
+  - cat ./coverage/lcov.info | ./coveralls/coveralls.js
