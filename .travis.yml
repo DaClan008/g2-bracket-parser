@@ -8,7 +8,7 @@ istanbul:
  - "latest"
 script: npm test
 before_script:
-  - npm install
+  - npm -d install
 
-notifications:
-  webhooks: https://coveralls.io/webhook?repo_token=Bv7mPH1bnxPKuvoCo5QnJJ10xAZFriXgm
+after_script:
+- cat ./build/coverage/**/lcov.info | .node_modules/coveralls/bin/coveralls.js
