@@ -6,3 +6,7 @@
 [![Issue Stats](http://issuestats.com/github/DaClan008/g2-bracket-parser/badge/issue?style=flat)](http://issuestats.com/github/DaClan008/g2-bracket-parser)
 
 Parse through a JavaScript string to find content in and around brackets ( "{ or [ or (" etc)
+
+# Please note that we are still busy building this project.  It should be fully up and running within the next day or 2.
+
+Thank you
