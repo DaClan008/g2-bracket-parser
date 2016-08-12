@@ -9,3 +9,4 @@ before_script:
 
 after_script:
   - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js --verbose
+  - bash <(curl -s https://codecov.io/bash)
