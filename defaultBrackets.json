@@ -1,6 +1,6 @@
 {
 	"[": {  "start": "[", "end": "]", "length": 1 },
-	"{": {  "start": "{", "end":"}", "length": 1	},
+	"{": {  "start": "{", "end":"}", "length": 1 },
 	"(": {  "start": "(", "end": ")", "length": 1 },
 	"\"": { "start": "\"", "end":"\"", "length":1 },
 	"'": {  "start": "'", "end": "'", "length": 1 },
