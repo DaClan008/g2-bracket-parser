@@ -4,6 +4,9 @@ var defaultBrackets = require("./defaultBrackets.json");
 module.exports = brackets;
 module.exports.Parser = Brackets;
 
+var pBrackets = {};
+var cBrackets = {};
+
 function brackets(str, options){
     var brk = new Brackets(str, options);
     var result = brk.parse();
@@ -22,30 +25,30 @@ function brackets(str, options){
  */
 function ResultSet(parentBrackets, childBrackets, index){
 	// RESULTS
+	// The complete source string that has been computed
+	this.src = "";
+	this.content = "";
 	// The index of the starting element for this object
 	this.start = index || 0;
 	// The current or last character's index in this object
 	this.end = this.start-1;
 	// The length of the current src string
 	this.length = this.end - this.start + 1;
-	// The complete source string that has been computed
-	this.src = "";
 	// The number of new lines or \n occurences in the src string
 	this.lines = 1;
-	// An object that resemble and has information of the matched criteria
-	this.match = false;
 	// A boolean indicating whether any of the children (or children's children) was calculated starting with a prefix
 	this.prefixedChildren = false;
+	// An object that resemble and has information of the matched criteria
+	this.match = false;
 
 	// INTERNAL usage
-	this.brkts = parentBrackets || {};
-	this.brktsChild = childBrackets || {};
+	pBrackets = parentBrackets || {};
+	cBrackets = childBrackets || {};
 
 	this.endString = "";
 	this.endLen = 0;
 
-	this.ignore = false;
-	var temp = "";
+	this.temp = "";
 }
 
 ResultSet.prototype = {
@@ -55,13 +58,14 @@ ResultSet.prototype = {
 	 * @return {string}     The value object.
 	 */
 	endTemp: function(val){
+		val = val || "";
 		var add = val.length > 0 ? this.temp.substr(0, this.temp.length - val.length) : this.temp;
 		this.src += add;
 		this.end += add.length;
 		
 		// clear variables
-		this.endings.removeCurrentAll();
-		this.brkts.removeCurrentAll();
+		if(this.endings) this.endings.removeCurrentAll();
+		pBrackets.removeCurrentAll();
 		this.temp = "";
 		return val;
 	},
@@ -82,7 +86,7 @@ ResultSet.prototype = {
 				var end = this.endings.confirm(char, true);
 				// we should just add a char until we get to end
 				if(end){
-					this.ignore = false;
+					this.ignore = undefined;
 					this.endings.removeCurrentAll();
 				}
 				this.src += char;
@@ -91,12 +95,13 @@ ResultSet.prototype = {
 			}
 			
 			// finding OPENING BRACKETS
-			var brkt = this.brkts.confirm(char);
+			var brkt = pBrackets.confirm(char);
 			if(brkt){
 				// we have totally matched an opening bracket
 				if (brkt.isIgnore){
 					// the opening bracket is the start of an ignore string
 					this.ignore = brkt;
+					if (!this.endings) this.endings = new bracketInfo();
 					this.endings.add(brkt.end, brkt);
 					this.endTemp();
 					this.src += char;
@@ -104,17 +109,17 @@ ResultSet.prototype = {
 					return false;
 				} else {
 					// remove prefix + brts
-					this.endTemp(brkt.brkt.prefix + brkt.start);
-					this.match = new BRKChild(brkt.prefix + brkt.start, this.end, brkt, this.brktsChild);
+					this.endTemp(brkt.prefix + brkt.start);
+					this.match = new BRKChild((brkt.prefix ||"")+ brkt.start, this.end + 1, brkt);
 					return false;
 				}
 			} else {
-				if(this.brkts.count > 0 || this.endings.count > 0){
+				if(pBrackets.count > 0 || (this.endings && this.endings.count > 0)){
 					this.temp += char;
 					return false;
 				}
 				if (this.temp !== ""){
-					this.clearTemp();
+					this.endTemp();
 				}
 				this.src += char;
 				this.end++;
@@ -124,7 +129,10 @@ ResultSet.prototype = {
 			// let CHILD deal with it
 			if(this.match.addChar(char)){
 				// The child has reached its closing bracket
-				this.content += this.match.content;
+				this.match.endings = undefined;
+				this.match.temp = undefined;
+
+				this.content += this.match.src;
 				this.src += this.match.src;
 				this.end += this.match.length;
 				this.length = this.src.length;
@@ -140,8 +148,8 @@ ResultSet.prototype = {
 	 * @return {object} if a bracket is open it will return an object containing the amount of opening brackets and the last opening bracket information, else null.
 	 */
 	workingBracket: function(){
-		if(match){
-			return match.getLastBracket();
+		if(this.match){
+			return this.match.getLastBracket();
 		}else {
 			return null;
 		}
@@ -156,31 +164,35 @@ ResultSet.prototype = {
  * @param {object} brackets        The total number of brackets that needs to be search through (in case there are more opening brackets within this object).
  * @param {string[]} multiCharBrkts  String array containing the key's of the brackets object that is longer than 2 chars in length.
  */
-function BRKChild(prefixedBracket, index, bracket, brackets){
+function BRKChild(prefixedBracket, index, bracket){
 	// result values
 	this.prefixedBracket = prefixedBracket || "";	// this include the bracket also
-	this.src = this.prefix;
+	this.src = this.prefixedBracket;
 	this.content = "";
-	this.lines = 1;
+
 	// positions
-	this.start = index || 0;
+	this.start = index  ||  0;
 	this.bracketStart = this.start + (bracket ? bracket.prefix ? bracket.prefix.length : 0 : 0);
 	this.contentStart = this.start + this.prefixedBracket.length;
-	this.end = this.contentStart;
-	this.contentEnd = this.contentStart;
+	this.end = this.contentStart -1;
+	this.contentEnd = this.contentStart-1;
+	
+	this.lines = 1;
+	this.length = 0;
+	this.count = 0;
+
 	// info
 	this.bracket = bracket;
-	this.children = [];
 	this.isPrefixed = bracket ? bracket.prefix ? true : false : false;
 	this.prefixedChildren = false;
 
+	this.children = [];
+
 	// internal use
-	this.brkts = brackets;
 	this.endings = new bracketInfo();
 	this.endings.add(bracket.end, bracket);
 
-	this.ignore = false;
-	var temp = "";
+	this.temp = "";
 }
 
 BRKChild.prototype = {
@@ -190,13 +202,14 @@ BRKChild.prototype = {
 	 * @return {string}     The value object.
 	 */
 	endTemp: function(val){
+		val = val || "";
 		var add = val.length > 0 ? this.temp.substr(0, this.temp.length - val.length) : this.temp;
 		this.content += add;
 		this.contentEnd += add.length;
 		
 		// clear variables
 		this.endings.removeCurrentAll();
-		this.brkts.removeCurrentAll();
+		cBrackets.removeCurrentAll();
 		this.temp = "";
 		return val;
 	},
@@ -216,7 +229,7 @@ BRKChild.prototype = {
 			if(this.ignore){
 				if(end){
 					// we are at end of ignore
-					this.ignore = false;
+					this.ignore = undefined;
 					this.endings.removeCurrentAll();
 				}
 				this.content += char;
@@ -228,16 +241,15 @@ BRKChild.prototype = {
 			if(end){
 				// we have reached the main ending tag
 				this.endTemp(this.bracket.end);
-				this.content += temp;
-				this.contentEnd += temp.length;
 				this.src += this.content + this.bracket.end;
 				this.end = this.contentEnd + this.bracket.end.length;
-				this.length = this.end - this.start;
+				this.length = this.end - this.start +1;
+				this.count = this.children.length;
 				return true;
 			}
 
 			// finding OPENING BRACKETS
-			var brkt = this.brkts.confirm(char);
+			var brkt = cBrackets.confirm(char);
 			if(brkt) {
 				// we have totally matched an opening bracket
 				if (brkt.isIgnore){
@@ -253,18 +265,18 @@ BRKChild.prototype = {
 				} else {
 					// remove prefix + brts
 					this.endTemp(brkt.prefix + brkt.start);
-					this.child = new BRKChild(brkt.prefix + brkt.start, this.contentEnd, brkt, this.brkts);
+					this.child = new BRKChild((brkt.prefix ? prkt.prefix : "") + brkt.start, this.contentEnd + 1, brkt);
 					return false;
 				}
 			} else {
-				if(this.brkts.count > 0 || this.endings.count > 0){
+				if(cBrackets.count > 0 || this.endings.count > 0){
 					// add to temp until both opening and closing brackets count is 0
 					this.temp += char;
 					return false;
 				}
 				if(this.temp !== ""){
 					// both's count = 0 therefore characters are no longer being dealt with brkts / endings
-					this.clearTemp();
+					this.endTemp();
 				}
 				this.content += char;
 				this.contentEnd++;
@@ -274,6 +286,7 @@ BRKChild.prototype = {
 			// let CHILD deal with it
 			if(this.child.addChar(char)){
 				// The child has reached its closing bracket
+				this.child.endings = undefined;
 				this.content += this.child.src;
 				this.contentEnd += this.child.length;
 				this.children.push(this.child);
@@ -339,6 +352,7 @@ bracketInfo.prototype = {
 	},
 	addCurrent: function(key, char){
 		this.current.push({ key: key, length: 1, last: key.length -1});
+		this.count++;
 	},
 	confirm: function(char, onlyIgnores){
 		if(this[char]){
@@ -351,7 +365,7 @@ bracketInfo.prototype = {
 		}
 		
 		// see if old brackets still apply
-		var i = count -1;
+		var i = this.count;
 		while(i--) {
 			if(this.current[i].key[this.current[i].length] === char){
 				// we still have a match
@@ -457,8 +471,7 @@ function Brackets(str, options){
 	//this.getMultiChars();
 	this.buildIgnores(ignores);
 	this.result = [];
-	this.working = new ResultSet(this.brackets,this.bracketsChild, this.multiCharBrkts, 
-		this.multiCharBrktsChild, this.start, this.ignoreInside, this.multiCharIgnore);
+	this.working = new ResultSet(this.brackets,this.bracketsChild, this.start);
 }
 
 Brackets.prototype = {
@@ -605,26 +618,26 @@ Brackets.prototype = {
         var char;
 		while(char = this.input[this.index++]){
 			if(this.working.addChar(char)){
+				this.working.temp = undefined;
+				this.working.endString = undefined;
+				this.working.endLen = undefined;
 				this.result.push(this.working);
 				this.src += this.working.src;
-				this.working = new ResultSet(this.brackets,this.bracketsChild, 
-					this.multiCharBrkts, this.multiCharBrktsChild, 
-					this.index, this.ignoreInside,
-					this.multiCharIgnore);
+				this.working = new ResultSet(this.brackets,this.bracketsChild, this.index);
 			}
 		}
 		// we have now come to the end of the line
 		if(this.working.match && !this.ignoreMissMatch){
 			// we found an opening bracket but did not find closing bracket
 			var last = this.working.workingBracket();
-			var msg = "", code = "UNMATCHED_CLOSING_BRACKETS", hint = false;
+			var msg = "", code = "UNMATCHED_CLOSING_BRACKETS", hint = "";
 			if(last){
-				msg = "There are " + last.depth + " missing closing brackets.\n";
+				msg = "There " + (last.depth === 1 ? "is " : "are ") + last.depth + " missing closing brackets.";
 				hint += "The next missing closing bracket required is " + last.bracket.end + ".";
 			} else{
-				msg = "\tThere is an insufficient amount of closing brackets in the provided string.";
+				msg = "There is an insufficient amount of closing brackets in the provided string.";
 			}
-			var str = "code:" + code + "\nmsg:" + msg + (hint ?  "\nhint:" + hint : "") + "\n\n\n";
+			var str = "\ncode: " + code + "\nmsg: " + msg + (hint != "" ?  "\nhint: " + hint : "") + "\n\n";
 			var err = new Error(str);
 			err.code = code;
 			err.msg = msg;
@@ -637,6 +650,8 @@ Brackets.prototype = {
 				}
 			}
 			throw err;
+		} else if (this.working.match){
+			this.result.push(this.working);
 		}
 		return this.result;
 	}
