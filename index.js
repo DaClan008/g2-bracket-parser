@@ -109,6 +109,7 @@ ResultSet.prototype = {
 					return false;
 				} else {
 					// remove prefix + brts
+					this.temp+=char;
 					this.endTemp(brkt.prefix + brkt.start);
 					this.match = new BRKChild((brkt.prefix ||"")+ brkt.start, this.end + 1, brkt);
 					return false;
@@ -240,6 +241,7 @@ BRKChild.prototype = {
 			// dealing with CLOSING BRACKETS
 			if(end){
 				// we have reached the main ending tag
+				this.temp += char;
 				this.endTemp(this.bracket.end);
 				this.src += this.content + this.bracket.end;
 				this.end = this.contentEnd + this.bracket.end.length;
@@ -264,8 +266,9 @@ BRKChild.prototype = {
 					return false;
 				} else {
 					// remove prefix + brts
+					this.temp += char;
 					this.endTemp(brkt.prefix + brkt.start);
-					this.child = new BRKChild((brkt.prefix ? prkt.prefix : "") + brkt.start, this.contentEnd + 1, brkt);
+					this.child = new BRKChild((brkt.prefix ? brkt.prefix : "") + brkt.start, this.contentEnd + 1, brkt);
 					return false;
 				}
 			} else {
@@ -287,6 +290,7 @@ BRKChild.prototype = {
 			if(this.child.addChar(char)){
 				// The child has reached its closing bracket
 				this.child.endings = undefined;
+				this.child.temp = undefined;
 				this.content += this.child.src;
 				this.contentEnd += this.child.length;
 				this.children.push(this.child);
@@ -341,7 +345,7 @@ bracketInfo.prototype = {
 		}
 	},
 	removeCurrent: function(index){
-		if(index >=0 && index < current.length){
+		if(index >=0 && index < this.current.length){
 			this.current.splice(index,1);
 			this.count--;
 		}
