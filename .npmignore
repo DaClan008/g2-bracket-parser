@@ -41,5 +41,6 @@ typings
 
 #remove git specific files and folders
 .vscode
-test.travis.yml
+test
+.travis.yml
 codecov.yml
