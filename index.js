@@ -562,7 +562,7 @@ function Brackets(str, options){
 	this.result = [];
 	this.working = new ResultSet(this.brackets,this.bracketsChild, this.start);
 
-	this.DEB = options.debug;
+	//this.DEB = options.debug;
 }
 
 Brackets.prototype = {
@@ -654,6 +654,9 @@ Brackets.prototype = {
 				if(!this.defaultBrackets) this.defaultBrackets = getDefaultBrackets();
 				if(this.defaultBrackets[brackets]){
 					this.addBracket(brackets, this.defaultBrackets[brackets]);
+				} else{
+					var obj = {start: brackets, end: brackets, length: brackets.length};
+					this.addBracket(brackets,obj);
 				}
 			default:
 				break;

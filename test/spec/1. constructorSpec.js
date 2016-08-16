@@ -126,10 +126,12 @@ describe("Testing Brackets Constructor options: ", function(){
             expect(result.brackets["("].start).toBe("(");
             expect(result.brackets["{"]).toBeUndefined();
         });
-        it("should not be able to add a string bracket if string does not exist in defaults", function(){
+        it("should be able to add a string bracket if string does not exist in defaults", function(){
             constructor.options.brackets = "abc";
             var result = new constructor.bracket.Parser("a", constructor.options);
-            expect(result.brackets["abc"]).toBeUndefined();    
+            expect(result.brackets["abc"]).not.toBeUndefined();
+            expect(result.brackets["abc"].end).toBe("abc");
+            expect(result.brackets["abc"].length).toEqual(3);
         });
         it("should handle a objects for bracket options", function(){
             constructor.options.brackets=  {
