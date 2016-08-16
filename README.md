@@ -1,6 +1,6 @@
 # g2-bracket-parser
 [![Build Status](https://travis-ci.org/DaClan008/g2-bracket-parser.svg?branch=master)](https://travis-ci.org/DaClan008/g2-bracket-parser)
-[![Coverage Status](https://coveralls.io/repos/github/DaClan008/g2-bracket-parser/badge.svg?branch=master)](https://coveralls.io/github/DaClan008/g2-bracket-parser?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/DaClan008/g2-bracket-parser/badge.svg?branch=master;ts=2)](https://coveralls.io/github/DaClan008/g2-bracket-parser?branch=master;ts=2)
 [![codecov](https://codecov.io/gh/DaClan008/g2-bracket-parser/branch/master/graph/badge.svg)](https://codecov.io/gh/DaClan008/g2-bracket-parser)
 [![Dependency Status](https://gemnasium.com/badges/github.com/DaClan008/g2-bracket-parser.svg)](https://gemnasium.com/github.com/DaClan008/g2-bracket-parser?)
 
@@ -179,7 +179,7 @@ Any of the following properties can be added as options:
     "key":{
             "start":"{", 
             "end":"}", 
-            "length":x, 
+            "length":]x, 
             "prefix":?
     },
     "key": {...}
