@@ -28,7 +28,7 @@ The result object will be an array of successfully closed brackets.
 It will give details of the following on each successful closing bracket.
 
 | Property | Information 
-| -------: | -----------
+| -------: | :-----------
 | src      | The source string for the given result.
 | content  | The content inside the brackets.
 | start    | The starting index for the src string.  This relate to the string provided to parse through.
@@ -128,7 +128,7 @@ Any of the following properties can be added as options:
 **_Options:_** 
     
 | option   | explanation
-| -------: | -----------
+| -------: | :-----------
 | _none_   | it does not matter if the prefix is applied to top most element or children.  The parser will consider a opening bracket to be either #{ or { if prefix is #.  This means that #{top most #{children}} or {top most {children}} or #{top most{children}} or {top most #{children}} will all be considered as being successful opening brackets.
 | _strict_ | Prefix must be available in all parent and child elements to be considered as being a successful opening bracket.  Therefore only #{top most #{children}} will be considered as brackets and not {top most {children}}.
 | _parentStrict_ | The top most bracket must start with a prefix, but the children may or may not start with the prefix.  e.g. #{top most {children}} or #{top most #{children}}, will all be captured as brackets.
@@ -179,10 +179,10 @@ Any of the following properties can be added as options:
     "key":{
             "start":"{", 
             "end":"}", 
-            "length":]x, 
-            "prefix":?
+            "length":"x", 
+            "prefix":"?"
     },
-    "key": {...}
+    "key": {}
 }
 ```
 * key => must be combination of prefix + start.  if no prefix is applicable then this should only be the value of start.
