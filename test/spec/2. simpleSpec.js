@@ -1,9 +1,15 @@
 /// <reference path="../../typings/jasmine/jasmine.d.ts"/>
 'use strict';
 require("jasmine");
-var bracket = require("../../");
 
 describe("A simplistic string tester", function(){
+    var bracket;
+    beforeEach(function(){
+        bracket = require("../../");
+    });
+    afterEach(function(){
+        bracket = undefined;
+    })
     it("should deal with string with no brackets and return an empty array", function(){
         var result = bracket("this is ordinary string");
         expect(result.length).toEqual(0);
@@ -11,7 +17,6 @@ describe("A simplistic string tester", function(){
     it("should deal with a string inside brackets", function(){
         var results = bracket("this is {inside brackets}");
         var result = results[0];
-
         expect(results.length).toEqual(1);
         expect(result.src).toBe("this is {inside brackets}");
         expect(result.content).toBe("{inside brackets}");
@@ -197,17 +202,6 @@ describe("A simplistic string tester", function(){
         expect(result.contentEnd).toEqual(12);
         expect(result.end).toEqual(13);
         expect(result.length).toEqual(3);
-    });
-    it("should throw error in case of bracket missmatch", function(){
-        
-        var str = "\ncode: UNMATCHED_CLOSING_BRACKETS";
-        str += "\nmsg: There is 1 missing closing brackets.";
-        str += "\nhint: The next missing closing bracket required is }.";
-        str += "\n\n";
-        expect(function(){ bracket("a {b"); }).toThrow(new Error(str));
-    });
-    it("should not throw error in case of a bracket missmatch if ignoreMissMatch is set to true", function(){
-        expect(function(){ bracket("a {b", {ignoreMissMatch: true}); }).not.toThrowError();
     });
     it("should ignore by default any brackets inside of single or double quotes", function(){
         var result = bracket("a '{' b");
