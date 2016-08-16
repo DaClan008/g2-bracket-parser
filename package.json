@@ -1,6 +1,6 @@
 {
   "name": "g2-bracket-parser",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Parse a JavaScript string to find conent in and arround brackets.",
   "main": "index.js",
   "scripts": {
