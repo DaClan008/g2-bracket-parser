@@ -1,10 +1,9 @@
 {
   "name": "g2-bracket-parser",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Parse a JavaScript string to find conent in and arround brackets.",
   "main": "index.js",
   "scripts": {
-    "prepublish":"uglifyjs -o index.min.js index.js",
     "test": "istanbul cover node_modules/jasmine/bin/jasmine.js JASMINE_CONFIG_PATH=./test/config.json"
   },
   "repository": {
@@ -15,7 +14,14 @@
     "parse",
     "bracket",
     "enclose",
-    "enclosing"
+    "enclosing",
+    "bracket-enclose",
+    "bracket-enclosing",
+    "bracket-parser",
+    "open-bracket",
+    "closing-bracket",
+    "open",
+    "close"
   ],
   "author": "Jan Lehmkuhl <DaClan008@users.noreply.github.com>",
   "license": "Apache-2.0",
@@ -26,7 +32,6 @@
   "devDependencies": {
     "coveralls": "^2.11.12",
     "istanbul": "^0.4.4",
-    "jasmine": "^2.4.1",
-    "uglify-js": "^2.7.1"
+    "jasmine": "^2.4.1"
   }
 }
