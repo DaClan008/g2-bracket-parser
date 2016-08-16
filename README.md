@@ -176,8 +176,13 @@ Any of the following properties can be added as options:
 **_Structure of Object_** If a custom object is used (either in list or stand alone). The object must look as follows:
 ```json
 {
-    key:{start:"{", end:"}", length:x, prefix:?},
-    key...
+    "key":{
+            "start":"{", 
+            "end":"}", 
+            "length":x, 
+            "prefix":?
+    },
+    "key": {...}
 }
 ```
 * key => must be combination of prefix + start.  if no prefix is applicable then this should only be the value of start.
