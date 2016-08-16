@@ -4,7 +4,7 @@
   "description": "Parse a JavaScript string to find conent in and arround brackets.",
   "main": "index.js",
   "scripts": {
-    "prepublish": "uglifyjs -o index.min.js index.js",
+    "build:js": "uglifyjs test.js -o index.min.js",
     "test": "istanbul cover node_modules/jasmine/bin/jasmine.js JASMINE_CONFIG_PATH=./test/config.json"
   },
   "repository": {
