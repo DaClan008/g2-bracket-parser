@@ -20,7 +20,7 @@ These brackets may sometimes:
 * appear `inside` other `brackets`.
 
 This module assists in finding these scenarios and return a workable object.
-For more information on how to use this module, consult our wiki page.
+For more information on how to use this module, consult our [wiki](https://github.com/DaClan008/g2-bracket-parser/wiki) page.
 
 ### extra functionality
 
@@ -39,6 +39,7 @@ It will give details of the following on each successful closing bracket.
 | length   | The length of the src string.
 
 The matched item will in addition also have more detail regarding the match.  i.e:
+
 | Property     | Information
 | -----------: | ---------- 
 | contentStart | The index where the content will start excluding the brackets.
@@ -207,6 +208,6 @@ _If prefix = test in above situation, x should be 5 and key should be test{, els
 
 ## Contribute
 -------------
-Please feel free to submit a pull request.  We will review and get back to you.  We hope our wiki provide clearer guidance as to the future of this project.
+Please feel free to submit a pull request.  We will review and get back to you.  We hope our [wiki](https://github.com/DaClan008/g2-bracket-parser/wiki) provide clearer guidance as to the future of this project.
 
 Thank you
