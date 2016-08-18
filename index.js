@@ -532,6 +532,7 @@ function Brackets(str, options){
 	}
 	this.input = this.original.substr(this.start,this.end - this.start + 1);
 	this.index = 0;
+	this.onlyFirst = options.onlyFirst;
 	this.bracketPrefix = options.prefix || "";
 	this.prefixOption = options.prefixOption || "normal"
 	this.prefixOptionInternal = this.prefixOption.toLowerCase();
@@ -558,10 +559,6 @@ function Brackets(str, options){
 
 	//this.getMultiChars();
 	this.buildIgnores(ignores);
-	
-	this.result = [];
-	this.working = new ResultSet(this.brackets,this.bracketsChild, this.start);
-
 	//this.DEB = options.debug;
 }
 
@@ -703,19 +700,23 @@ Brackets.prototype = {
 	 * The main function that itterates through all the characters in the input string and returns a resulting array of objects
 	 */
 	parse: function() {
-        var char;
-		while(char = this.input[this.index++]){
+        var char, foundFirst = false;
+		this.result = [];
+		this.working = new ResultSet(this.brackets,this.bracketsChild, this.start);
+		while(!foundFirst && (char = this.input[this.index++])){
 			if(this.working.addChar(char)){
 				this.working.temp = undefined;
 				this.working.endString = undefined;
 				this.working.endLen = undefined;
 				this.result.push(this.working);
 				this.src += this.working.src;
-				this.working = new ResultSet(this.brackets,this.bracketsChild, this.index);
+				if(!this.onlyFirst){
+					this.working = new ResultSet(this.brackets,this.bracketsChild, this.index);
+				} else foundFirst = true;
 			}
 		}
 		// we have now come to the end of the line
-		if(this.working.match && !this.ignoreMissMatch){
+		if(!foundFirst && this.working.match && !this.ignoreMissMatch){
 			// we found an opening bracket but did not find closing bracket
 			var last = this.working.workingOpenBracket();
 
@@ -760,7 +761,7 @@ Brackets.prototype = {
 				if(this.autoComplete) this.working.finalize(true);
 				this.result.push(this.working);
 			}
-		} else if (this.working.match){
+		} else if (this.working.match && !foundFirst){
 			this.result.push(this.working);
 		}
 		this.brackets = this.parentBrackets = pBrackets = cBrackets = undefined;

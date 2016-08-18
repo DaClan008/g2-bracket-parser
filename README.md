@@ -86,6 +86,13 @@ Options must be an object e.g:
 
 Any of the following properties can be added as options:
 
+### **_onlyFirst_**
+**_Desc:_** If set to true this will only return the first completed bracket set.  
+
+**_Example:_** e.g. in "a {b} c {d}" only "a {b}" will be returned if onlyFirst is set to ture, and c {d} will not be parsed through at all.
+
+**_Default_** false [the entire provided string will be iterated over.]
+
 ### **start**
 **_Desc:_** Provides an alternative starting position.<br />
 

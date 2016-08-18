@@ -221,4 +221,10 @@ describe("A simplistic string tester", function(){
         expect(result[0].match.count).toEqual(0);
 
     });
+    it("should only return the first completed object if onlyFirst option is set to true", function(){
+        var result = new bracket("a {b {c}} d {e} f{g}", { onlyFirst: true});
+        expect(result.length).toEqual(1);
+        expect(result[0].src).toBe("a {b {c}}");
+        expect(result[0].match.src).toBe("{b {c}}");
+    });
 });
