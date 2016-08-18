@@ -29,6 +29,7 @@ describe("Testing complex string queries", function(){
         it("should stop closing brackets testing if new line symbol is found", function(){
             complex.options.brackets = {"{":{start:"{", end:"test}", length: 1}};
             var result = complex.newLines("a {b test\n}test}", complex.options)[0];
+
             expect(result.lines).toEqual(2);
             expect(result.content).toBe("{b test\n}test}");
 
@@ -205,6 +206,7 @@ describe("Testing complex string queries", function(){
         it("should close required bracket if found inside a miss match type", function(){
             complex.options.ignoreMissMatch = ["{", "("];
             var results = complex.miss("a [b (c d] {d {e", complex.options);
+
             expect(results[0].src).toBe("a [b (c d]");
             expect(results[0].content).toBe("[b (c d]")
             expect(results[0].match.src).toBe("[b (c d]");
@@ -222,7 +224,8 @@ describe("Testing complex string queries", function(){
             expect(results[1].match.content).toBe("d {e");
 
             expect(results[1].match.child.count).toEqual(0);
-            expect(results[1].match.child.src).toBe("{e");
+            expect(results[1].match.child.startString).toBe("d ")
+            expect(results[1].match.child.src).toBe("d {e");
             expect(results[1].match.child.content).toBe("e");
     
             expect(results[1].closed).toBeFalsy();
@@ -234,6 +237,7 @@ describe("Testing complex string queries", function(){
             complex.options.autoComplete = false;
 
             var results = complex.miss("a [b (c d] {d {e ", complex.options);
+
             expect(results[0].src).toBe("a [b (c d]");
             expect(results[0].match.src).toBe("[b (c d]");
             expect(results[0].match.children.length).toEqual(1);
@@ -247,11 +251,13 @@ describe("Testing complex string queries", function(){
             expect(results[1].match.count).toEqual(0);
             expect(results[1].match.children.length).toEqual(0);
             expect(results[1].match.src).toBe("{");
-            expect(results[1].match.content).toBe("d ");
+            expect(results[1].match.content).toBe("");
             expect(results[1].closed).toBeFalsy();
             expect(results[1].match.closed).toBeFalsy();
-            expect(results[1].match.child.content).toBe("e ");
-            expect(results[1].match.child.src).toBe("{")
+            expect(results[1].match.child.startString).toBe("d ");
+            expect(results[1].match.child.endString).toBe("e ");
+            expect(results[1].match.child.content).toBe("");
+            expect(results[1].match.child.src).toBe("d {")
             expect(results[1].match.child.count).toEqual(0);
         });
 

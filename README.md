@@ -27,30 +27,33 @@ For more information on how to use this module, consult our [wiki](https://githu
 The result object will be an array of successfully closed brackets.  
 It will give details of the following on each successful closing bracket.
 
-| Property | Information 
-| -------: | :-----------
-| src      | The source string for the given result.
-| content  | The content inside the brackets.
-| start    | The starting index for the src string.  This relate to the string provided to parse through.
-| end      | The index of the last character of the src string.
-| lines    | The total amount of "\n" characters found in the src string.
-| closed   | Whether the current bracket has been sufficiently closed with a closing bracket (i.e. { -> needs } to be true).
-| match    | The matching data or data that is inside the brackets.
-| length   | The length of the src string.
+| Property | Type    | Information 
+| -------: | ------- | :-----------
+| src      | string  | The source string for the given result.
+| content  | string  | The content inside the brackets.
+| start    | integer | The starting index for the src string.  This relate to the string provided to parse through.
+| end      | integer | The index of the last character of the src string.
+| lines    | integer | The total amount of "\n" characters found in the src string.
+| closed   | boolean | Whether the current bracket has been sufficiently closed with a closing bracket (i.e. { -> needs } to be true).
+| match    | object  | The matching data or data that is inside the brackets.
+| length   | integer | The length of the src string.
 
 The matched item will in addition also have more detail regarding the match.  i.e:
 
-| Property     | Information
-| -----------: | ---------- 
-| contentStart | The index where the content will start excluding the brackets.
-| bracketStart | The index where the opening bracket will start (thus if the bracket.length = 1 this will be contentStart - 1)
-| start        | Might be different to bracketstart depending whether or not an opening bracket should have a prefix (i.e. #{ );
-| contentEnd   | This will also differ from normal end by the total length of the closing bracket (usually 1).
-| count        | The total number of "children" or child bracket have been found in this item.
-| children     | All the direct children objects (with same properties as this).  A child could be a closed bracket pair that is found inside the current item.
-| bracket      | Information of the bracket that caused the creation of this item.  i.e. what caused this item to be considered as opened or closed.
-| isPrefixed   | Determine if this item used a prefix in front of an opening bracket (i.e. #{ ).
-| prefixedChildren | Determine if any of the children used a prefix in front of an opening bracket.
+| Property     | Type    | Information
+| -----------: | ------- | ---------- 
+| startString  | string  | A string value that is directly in front of the bracket.
+| endString    | string  | A string value of the content that followed the last closing bracket of a child element.  This will mostly be an empty string, unless content follows the closing bracket.  Once again this is only applicable to child elements and not the resultSet.  Content that follows the last closing bracket in a resultSet will be ignored.
+| endStart     | integer | Index where the endString will start.
+| contentStart | integer | The index where the content will start excluding the brackets.
+| bracketStart | integer | The index where the opening bracket will start (thus if the bracket.length = 1 this will be contentStart - 1)
+| start        | integer | Might be different to bracketstart depending whether or not an opening bracket should have a prefix (i.e. #{ );
+| contentEnd   | integer | This will also differ from normal end by the total length of the closing bracket (usually 1).
+| count        | integer | The total number of "children" or child bracket have been found in this item.
+| children     | child[] | All the direct children objects (with same properties as this).  A child could be a closed bracket pair that is found inside the current item.
+| bracket      | object  | Information of the bracket that caused the creation of this item.  i.e. what caused this item to be considered as opened or closed.
+| isPrefixed   | boolean | Determine if this item used a prefix in front of an opening bracket (i.e. #{ ).
+| prefixedChildren | boolean | Determine if any of the children used a prefix in front of an opening bracket.
 
 
 ## Install
