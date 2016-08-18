@@ -185,18 +185,23 @@ ResultSet.prototype = {
  * @param {object} brackets        The total number of brackets that needs to be search through (in case there are more opening brackets within this object).
  * @param {string[]} multiCharBrkts  String array containing the key's of the brackets object that is longer than 2 chars in length.
  */
-function BRKChild(prefixedBracket, index, bracket, parentBracket){
+function BRKChild(prefixedBracket, index, bracket, parentBracket, startString){
 	// result values
-	this.prefixedBracket = prefixedBracket || "";	// this include the bracket also
-	this.src = this.prefixedBracket;
+	prefixedBracket = prefixedBracket || "";	// this include the bracket also
+	this.startString = startString || "";
+	this.endString = "";
+	this.src = this.startString + prefixedBracket;
 	this.content = "";
 
 	// positions
-	this.start = index  ||  0;
-	this.bracketStart = this.start + (bracket ? bracket.prefix ? bracket.prefix.length : 0 : 0);
-	this.contentStart = this.start + this.prefixedBracket.length;
+	this.start = index - this.startString.length  ||  0;
+	this.prefixStart = index;
+	this.bracketStart = this.prefixStart + (bracket ? bracket.prefix ? bracket.prefix.length : 0 : 0);
+	this.contentStart = this.prefixStart + prefixedBracket.length;
+	this.endStart = this.contentStart;
 	this.end = this.contentStart -1;
 	this.contentEnd = this.contentStart-1;
+	this.tempLength = 0;
 	
 	this.lines = 1;
 	this.length = 0;
@@ -237,8 +242,8 @@ BRKChild.prototype = {
 	endTemp: function(val){
 		val = val || "";
 		var add = val.length > 0 ? this.temp.substr(0, this.temp.length - val.length) : this.temp;
-		this.content += add;
-		this.contentEnd += add.length;
+		this.endString += add;
+		this.tempLength += add.length;
 		
 		// clear variables
 		this.endings.removeCurrentAll();
@@ -262,11 +267,14 @@ BRKChild.prototype = {
 			if(this.ignore){
 				if(end){
 					// we are at end of ignore
+					// remove from endings object
+					this.endings[this.ignore.end] = undefined;
+					// remove local
 					this.ignore = undefined;
 					this.endings.removeCurrentAll();
 				}
-				this.content += char;
-				this.contentEnd++;
+				this.endString += char;
+				this.tempLength++;
 				return false;
 			}
 			
@@ -292,14 +300,16 @@ BRKChild.prototype = {
 					this.endings.add(brkt.end, brkt);
 
 					this.endTemp();
-					this.content += char;
-					this.contentEnd++;
+					this.endString += char;
+					this.tempLength++;
 					return false;
 				} else {
 					// remove prefix + brts
 					this.temp += char;
 					this.endTemp(brkt.prefix + brkt.start);
-					this.child = new BRKChild((brkt.prefix ? brkt.prefix : "") + brkt.start, this.contentEnd + 1, brkt, this.parentBracket);
+					this.child = new BRKChild((brkt.prefix ? brkt.prefix : "") + brkt.start, this.contentEnd + this.tempLength + 1, brkt, this.parentBracket, this.endString);
+					this.endString = "";
+					this.tempLength = 0;
 					return false;
 				}
 			} else {
@@ -312,8 +322,8 @@ BRKChild.prototype = {
 					// both's count = 0 therefore characters are no longer being dealt with brkts / endings
 					this.endTemp();
 				}
-				this.content += char;
-				this.contentEnd++;
+				this.endString += char;
+				this.tempLength++;
 				return false;
 			}
 		} else {
@@ -337,6 +347,7 @@ BRKChild.prototype = {
 					// close this item
 					this.child.matched = undefined;
 					this.child.parentBracket = undefined;
+					
 					this.children.push(this.child);
 					this.child = undefined;
 					this.count++;
@@ -379,18 +390,25 @@ BRKChild.prototype = {
 			if(finalize) this.child.finalize(true);
 			this.lines += this.child.lines -1;
 			this.content += this.child.src;
-			this.contentEnd += this.child.length;
+			this.contentEnd = this.child.end;
+			this.child.parentBracket = undefined;
 			this.prefixedChildren = this.prefixedChildren || (this.child.isPrefixed || this.child.prefixedChildren);
 		}
 	},
 	finalize: function(finalize) {
 		this.childClose(finalize);
+		this.content = this.content + this.endString;
+		if(this.endString === this.content) this.endString = "";
+		this.contentEnd += this.tempLength;
 
 		this.src += this.content + (this.closed ? this.bracket.end : "");
 		this.end = this.contentEnd + (this.closed ? this.bracket.end.length : 0);
 		this.length = this.end - this.start +1;
 		if(finalize && this.child) this.children.push(this.child);
 		this.count = this.children.length;
+		this.parentBracket = undefined;
+		this.endStart = this.contentEnd - this.endString.length + (this.endString === "" ? 0 : 1);
+		this.tempLength = undefined;
 	}
 }
 

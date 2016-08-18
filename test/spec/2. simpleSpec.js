@@ -17,6 +17,7 @@ describe("A simplistic string tester", function(){
     it("should deal with a string inside brackets", function(){
         var results = bracket("this is {inside brackets}");
         var result = results[0];
+
         expect(results.length).toEqual(1);
         expect(result.src).toBe("this is {inside brackets}");
         expect(result.content).toBe("{inside brackets}");
@@ -28,7 +29,8 @@ describe("A simplistic string tester", function(){
         expect(result.prefixedChildren).toBe(false);
         expect(result.match.src).toBe("{inside brackets}");
         expect(result.match.content).toBe("inside brackets");
-        expect(result.match.prefixedBracket).toBe("{");
+        expect(result.match.startString).toBe("");
+        expect(result.match.endString).toBe("");
         expect(result.match.start).toEqual(8);
         expect(result.match.bracketStart).toEqual(8);
         expect(result.match.contentStart).toEqual(9);
@@ -46,6 +48,7 @@ describe("A simplistic string tester", function(){
         var result = results[0];
 
         expect(results.length).toEqual(1);
+
         expect(result.src).toBe("this is {inside brackets{inside brackets}}");
         expect(result.content).toBe("{inside brackets{inside brackets}}");
         expect(result.start).toEqual(0);
@@ -56,11 +59,16 @@ describe("A simplistic string tester", function(){
         expect(result.prefixedChildren).toBe(false);
         expect(result.match.src).toBe("{inside brackets{inside brackets}}");
         expect(result.match.content).toBe("inside brackets{inside brackets}");
-        expect(result.match.prefixedBracket).toBe("{");
+        expect(result.match.startString).toBe("");
+        expect(result.match.endString).toBe("");
+        expect(result.match.endStart).toEqual(result.match.contentEnd);
+
         expect(result.match.start).toEqual(8);
+        expect(result.match.prefixStart).toEqual(8);
         expect(result.match.bracketStart).toEqual(8);
         expect(result.match.contentStart).toEqual(9);
         expect(result.match.contentEnd).toEqual(40);
+        expect(result.match.endStart).toEqual(40);
         expect(result.match.end).toEqual(41);
         expect(result.match.lines).toEqual(1);
         expect(result.match.length).toEqual(34);
@@ -69,16 +77,17 @@ describe("A simplistic string tester", function(){
         expect(result.match.children.length).toEqual(result.match.count);
 
         var result = result.match.children[0];
-        expect(result.src).toBe("{inside brackets}");
+        expect(result.src).toBe("inside brackets{inside brackets}");
         expect(result.content).toBe("inside brackets");
-        expect(result.prefixedBracket).toBe("{");
-        expect(result.start).toEqual(24);
+        expect(result.startString).toBe("inside brackets");
+        expect(result.endString).toBe("");
+        expect(result.start).toEqual(9);
         expect(result.bracketStart).toEqual(24);
         expect(result.contentStart).toEqual(25);
         expect(result.contentEnd).toEqual(39);
         expect(result.end).toEqual(40);
         expect(result.lines).toEqual(1);
-        expect(result.length).toEqual(17);
+        expect(result.length).toEqual(32);
         expect(result.count).toEqual(0);
         expect(result.isPrefixed).toBe(false);
         expect(result.prefixedChildren).toBe(false);
@@ -104,25 +113,31 @@ describe("A simplistic string tester", function(){
         expect(result.match.length).toEqual(11);
 
         var result = result.match.children[0];
-        expect(result.src).toBe("{c {d}}");
+        expect(result.src).toBe("b {c {d}}");
+        expect(result.startString).toBe("b ");
+        expect(result.endString).toBe("");
         expect(result.content).toBe("c {d}");
-        expect(result.start).toEqual(5);
+        expect(result.start).toEqual(3);
         expect(result.bracketStart).toEqual(5);
         expect(result.contentStart).toEqual(6);
         expect(result.contentEnd).toEqual(10);
+        expect(result.endStart).toEqual(10);
         expect(result.end).toEqual(11);
-        expect(result.length).toEqual(7);
+        expect(result.length).toEqual(9);
 
         var result = result.children[0];
-        expect(result.src).toBe("{d}");
+        expect(result.src).toBe("c {d}");
         expect(result.content).toBe("d");
-        expect(result.start).toEqual(8);
+        expect(result.startString).toBe("c ")
+        expect(result.start).toEqual(6);
+        expect(result.prefixStart).toEqual(8);
         expect(result.bracketStart).toEqual(8);
         expect(result.contentStart).toEqual(9);
         expect(result.contentEnd).toEqual(9);
+        expect(result.endStart).toEqual(9);
         expect(result.end).toEqual(10);
         expect(result.lines).toEqual(1);
-        expect(result.length).toEqual(3);
+        expect(result.length).toEqual(5);
     });
     it("should deal with a string with 2 main brackets", function(){
         var results = bracket("a {b {c} d} e {f} g");
@@ -137,22 +152,31 @@ describe("A simplistic string tester", function(){
 
         expect(result.match.src).toBe("{b {c} d}");
         expect(result.match.content).toBe("b {c} d");
+        expect(result.match.endString).toBe(" d");
+        expect(result.match.startString).toBe("");
         expect(result.match.start).toEqual(2);
+        expect(result.match.prefixStart).toEqual(2);
         expect(result.match.bracketStart).toEqual(2);
         expect(result.match.contentStart).toEqual(3);
         expect(result.match.contentEnd).toEqual(9);
         expect(result.match.end).toEqual(10);
+        expect(result.match.endStart).toEqual(8);
         expect(result.match.length).toEqual(9);
+        expect(result.match.children.length).toEqual(1);
+        expect(result.match.count).toEqual(1);
 
         var result = result.match.children[0];
-        expect(result.src).toBe("{c}");
+        expect(result.src).toBe("b {c}");
         expect(result.content).toBe("c");
-        expect(result.start).toEqual(5);
+        expect(result.startString).toBe("b ");
+        expect(result.endString).toBe("");
+        expect(result.start).toEqual(3);
         expect(result.bracketStart).toEqual(5);
         expect(result.contentStart).toEqual(6);
         expect(result.contentEnd).toEqual(6);
         expect(result.end).toEqual(7);
-        expect(result.length).toEqual(3);
+        expect(result.endStart).toEqual(6);
+        expect(result.length).toEqual(5);
 
         var result = results[1];
         expect(results.length).toEqual(2);
@@ -182,29 +206,35 @@ describe("A simplistic string tester", function(){
         expect(result.match.end).toEqual(16);
         expect(result.match.length).toEqual(15);
         expect(result.match.count).toEqual(2);
+        expect(result.match.endString).toEqual(" f");
+        expect(result.match.endStart).toEqual(14);
 
         var result = result.match.children[0];
-        expect(result.src).toBe("{c}");
+        expect(result.src).toBe("b {c}");
+        expect(result.startString).toBe("b ");
         expect(result.content).toBe("c");
-        expect(result.start).toEqual(5);
+        expect(result.endString).toBe("");
+        expect(result.start).toEqual(3);
         expect(result.bracketStart).toEqual(5);
         expect(result.contentStart).toEqual(6);
         expect(result.contentEnd).toEqual(6);
         expect(result.end).toEqual(7);
-        expect(result.length).toEqual(3);
+        expect(result.length).toEqual(5);
 
         var result = results[0].match.children[1];
-        expect(result.src).toBe("{e}");
+        expect(result.src).toBe(" d {e}");
+        expect(result.startString).toBe(" d ");
         expect(result.content).toBe("e");
-        expect(result.start).toEqual(11);
+        expect(result.start).toEqual(8);
         expect(result.bracketStart).toEqual(11);
         expect(result.contentStart).toEqual(12);
         expect(result.contentEnd).toEqual(12);
         expect(result.end).toEqual(13);
-        expect(result.length).toEqual(3);
+        expect(result.length).toEqual(6);
     });
     it("should ignore by default any brackets inside of single or double quotes", function(){
         var result = bracket("a '{' b");
+
         expect(function(){ bracket("a '{' c"); }).not.toThrowError();
         expect(result.length).toEqual(0);
         result = bracket("a {b '{' c}");
